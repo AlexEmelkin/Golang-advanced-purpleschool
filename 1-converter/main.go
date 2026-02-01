@@ -14,9 +14,7 @@ func main() {
 
 }
 
-func converter(cur float64, originalCur string, targetCur string) float64 {
-	var res float64
-	m := map[string]map[string]float64{}
+func curMap(m map[string]map[string]float64) {
 	mF := map[string]float64{}
 	mF["EUR"] = Usd2Eur
 	mF["RUB"] = Usd2Rub
@@ -29,6 +27,13 @@ func converter(cur float64, originalCur string, targetCur string) float64 {
 	mF["USD"] = 1 / Usd2Rub
 	mF["EUR"] = 1 / Eur2Rub
 	m["RUB"] = mF
+
+}
+
+func converter(cur float64, originalCur string, targetCur string) float64 {
+	var res float64
+	m := map[string]map[string]float64{}
+	curMap(m)
 	mV, ok := m[originalCur]
 	if ok {
 		res = mV[targetCur] * cur
