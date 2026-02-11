@@ -1,6 +1,7 @@
 package bins
 
 import (
+	"encoding/json"
 	"errors"
 	"time"
 )
@@ -14,6 +15,14 @@ type Bin struct {
 
 type BinList struct {
 	Bins []Bin
+}
+
+func (binList *BinList) ToBytes() ([]byte, error) {
+	file, err := json.Marshal(binList)
+	if err != nil {
+		return nil, err
+	}
+	return file, nil
 }
 
 func NewBin(id string, private bool, createdAt time.Time, name string) (*Bin, error) {
