@@ -2,16 +2,27 @@ package file
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 )
 
-func ReadFile(path string) ([]byte, error) {
-	extension := filepath.Ext(path)
+type JsonDb struct {
+	filepath string
+}
+
+func NewJsonDb(path string) *JsonDb {
+	return &JsonDb{
+		filepath: path,
+	}
+}
+
+func (db *JsonDb) Read() ([]byte, error) {
+	extension := filepath.Ext(db.filepath)
 	if extension != ".json" {
 		return nil, errors.New("NOT_JSON_EXT")
 	}
-	data, err := os.ReadFile(path)
+	data, err := os.ReadFile(db.filepath)
 	if err != nil {
 		return nil, err
 	}
@@ -19,4 +30,18 @@ func ReadFile(path string) ([]byte, error) {
 
 }
 
-func WriteFile() {}
+func (db *JsonDb) Write(content []byte) {
+	file, err := os.Create(db.filepath)
+	if err != nil {
+		//output.PrintError(err)
+		fmt.Println(err)
+	}
+	_, err = file.Write(content)
+	defer file.Close()
+	if err != nil {
+		//output.PrintError(err)
+		fmt.Println("WriteString", err)
+		return
+	}
+	fmt.Println("Запись успешна")
+}

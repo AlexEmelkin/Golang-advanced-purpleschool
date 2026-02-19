@@ -1,12 +1,8 @@
 package storage
 
 import (
-	"HomeTask/3-struct/bins"
-	"encoding/json"
 	"fmt"
 	"os"
-
-	"github.com/fatih/color"
 )
 
 func SaveBinList(content []byte, name string) error {
@@ -24,17 +20,17 @@ func SaveBinList(content []byte, name string) error {
 
 }
 
-func ReadBinList(name string) (*bins.BinList, error) {
-	var bl *bins.BinList
+func Read(name string) ([]byte, error) {
 	data, err := os.ReadFile(name)
 	if err != nil {
-		return &bins.BinList{}, err
+		return nil, err
 	}
-	err = json.Unmarshal(data, &bl)
+	return data, nil
+	/*err = json.Unmarshal(data, &bl)
 	if err != nil {
 		color.Red("Не удалось разобрать файл " + err.Error())
 		return &bins.BinList{}, err
 	}
 
-	return bl, nil
+	return bl, nil*/
 }

@@ -1,10 +1,18 @@
 package bins
 
 import (
+	"HomeTask/3-struct/storage"
 	"encoding/json"
 	"errors"
 	"time"
+
+	"github.com/fatih/color"
 )
+
+type Db interface {
+	Read() ([]byte, error)
+	Write([]byte)
+}
 
 type Bin struct {
 	Id        string
@@ -15,6 +23,11 @@ type Bin struct {
 
 type BinList struct {
 	Bins []Bin
+}
+
+type BinListWithDb struct {
+	BinList
+	db Db
 }
 
 func (binList *BinList) ToBytes() ([]byte, error) {
@@ -42,9 +55,50 @@ func NewBin(id string, private bool, createdAt time.Time, name string) (*Bin, er
 	}
 }
 
-func NewBinList(arrB []Bin) *BinList {
+/*func NewBinList(arrB []Bin) *BinList {
 	bl := &BinList{}
 	bl.Bins = arrB
 	return bl
 
+}*/
+
+func NewBinList(db Db) *BinListWithDb {
+	//db := files.NewJsonDb("data.json")
+	file, err := db.Read()
+	if err != nil {
+		return &BinListWithDb{
+			BinList: BinList{
+				Bins: []Bin{},
+			},
+			db: db,
+		}
+	}
+
+	var binList BinList
+	err = json.Unmarshal(file, &binList)
+	if err != nil {
+		//("Не удалось разобрать файл " + err.Error())
+		color.Red("Не удалось разобрать файл " + err.Error())
+		return &BinListWithDb{
+			BinList: BinList{
+				Bins: []Bin{},
+			},
+			db: db,
+		}
+	}
+	return &BinListWithDb{
+		BinList: binList,
+		db:      db,
+	}
+}
+
+func (binList *BinListWithDb) AddBin(bin Bin) {
+
+	binList.Bins = append(binList.Bins, bin)
+	data, err := binList.BinList.ToBytes()
+	if err != nil {
+		//output.PrintError(err)
+		color.Red("Не удалось преобразовать файл " + err.Error())
+	}
+	storage.SaveBinList(data, "binList.json")
 }
