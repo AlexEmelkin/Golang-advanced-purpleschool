@@ -3,6 +3,7 @@ package main
 import (
 	"HomeTask/3-struct/bins"
 	"HomeTask/3-struct/file"
+	"HomeTask/3-struct/storage"
 	"fmt"
 	"time"
 
@@ -11,19 +12,19 @@ import (
 
 func main() {
 
-	binList := bins.NewBinList(file.NewJsonDb("data.json"))
+	binList := bins.NewBinList(storage.NewStorageDb("storage.json"))
 Menu:
 	for {
-		variant := promptData([]string{"1. Создать бинлист", "2. Прочиатть  бинлист", "3. Прочиать файл json", "4. Выход", "Выберите вариант"})
+		variant := promptData([]string{"1. Создать бинлист", "2. Прочитать  бинлист", "3. Прочиать файл json", "4. Выход", "Выберите вариант"})
 		switch variant {
 		case "1":
 			createBinList(binList)
 
-		/*case "2":
-			findAccount(vault)
+		case "2":
+			readBinList(binList)
 
 		case "3":
-			deleteAccount(vault)*/
+			readFile()
 
 		default:
 			break Menu
@@ -63,4 +64,27 @@ func createBinList(binList *bins.BinListWithDb) {
 		return
 	}
 	binList.AddBin(*myBinList)
+}
+
+func readBinList(binList *bins.BinListWithDb) {
+	if len(binList.Bins) > 0 {
+		fmt.Println("Список bin:")
+		for _, bin := range binList.Bins {
+			bin.Output()
+		}
+	} else {
+		color.Red("Список bin пуст")
+	}
+}
+
+func readFile() {
+	filepath := promptData([]string{"Введите путь до файла"})
+	db := file.NewJsonDb(filepath)
+	data, err := db.Read()
+	if err != nil {
+		color.Red("Ошибка чтения файла", err)
+	} else {
+		color.Cyan(string(data))
+	}
+
 }

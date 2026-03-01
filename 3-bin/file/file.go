@@ -30,7 +30,7 @@ func (db *JsonDb) Read() ([]byte, error) {
 
 }
 
-func (db *JsonDb) Write(content []byte) {
+func (db *JsonDb) Save(content []byte) {
 	file, err := os.Create(db.filepath)
 	if err != nil {
 		//output.PrintError(err)

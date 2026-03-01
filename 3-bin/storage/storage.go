@@ -5,23 +5,32 @@ import (
 	"os"
 )
 
-func SaveBinList(content []byte, name string) error {
-	file, err := os.Create(name)
+type StorageDb struct {
+	name string
+}
+
+func NewStorageDb(fileName string) *StorageDb {
+	return &StorageDb{
+		name: fileName,
+	}
+}
+
+func (db *StorageDb) Save(content []byte) {
+	file, err := os.Create(db.name)
 	if err != nil {
-		return err
+		fmt.Println(err)
 	}
 	_, err = file.Write(content)
 	defer file.Close()
 	if err != nil {
-		return err
+		fmt.Println(err)
 	}
 	fmt.Println("Запись успешна")
-	return nil
 
 }
 
-func Read(name string) ([]byte, error) {
-	data, err := os.ReadFile(name)
+func (db *StorageDb) Read() ([]byte, error) {
+	data, err := os.ReadFile(db.name)
 	if err != nil {
 		return nil, err
 	}

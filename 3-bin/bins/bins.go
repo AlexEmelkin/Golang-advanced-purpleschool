@@ -1,7 +1,6 @@
 package bins
 
 import (
-	"HomeTask/3-struct/storage"
 	"encoding/json"
 	"errors"
 	"time"
@@ -11,18 +10,18 @@ import (
 
 type Db interface {
 	Read() ([]byte, error)
-	Write([]byte)
+	Save([]byte)
 }
 
 type Bin struct {
-	Id        string
-	Private   bool
-	CreatedAt time.Time
-	Name      string
+	Id        string    `json:"id"`
+	Private   bool      `json:"private"`
+	CreatedAt time.Time `json:"createdAt"`
+	Name      string    `json:"name"`
 }
 
 type BinList struct {
-	Bins []Bin
+	Bins []Bin `json:"bins"`
 }
 
 type BinListWithDb struct {
@@ -53,6 +52,17 @@ func NewBin(id string, private bool, createdAt time.Time, name string) (*Bin, er
 		}, nil
 
 	}
+}
+
+func (bin *Bin) Output() {
+	color.Cyan(bin.Id)
+	if bin.Private {
+		color.Cyan("Private")
+	} else {
+		color.Cyan("Public")
+	}
+	color.Cyan(bin.Name)
+	color.Cyan(bin.CreatedAt.String())
 }
 
 /*func NewBinList(arrB []Bin) *BinList {
@@ -100,5 +110,5 @@ func (binList *BinListWithDb) AddBin(bin Bin) {
 		//output.PrintError(err)
 		color.Red("Не удалось преобразовать файл " + err.Error())
 	}
-	storage.SaveBinList(data, "binList.json")
+	binList.db.Save(data)
 }
