@@ -64,25 +64,46 @@ func str2num(numberStr string) ([]int, error) {
 
 }
 
+var calcMap = map[string]func([]int) float64{
+	"SUM": calculateSum,
+	"AVG": calculateAvg,
+	"MED": calculateMedian,
+}
+
 func calculate(operation string, num2calc []int) float64 {
 
 	var res float64
-	if operation == "SUM" {
-		for _, n := range num2calc {
-			res = res + float64(n)
-		}
+	calcFunc := calcMap[operation]
+	res = calcFunc(num2calc)
+	/*if operation == "SUM" {
+		res = calculateSum(num2calc)
 	} else if operation == "AVG" {
-		cnt := 0
-		for _, n := range num2calc {
-			res = res + float64(n)
-			cnt = cnt + 1
-		}
-		res = res / float64(cnt)
+		res = calculateAvg(num2calc)
 	} else if operation == "MED" {
 		res = calculateMedian(num2calc)
-	}
+	}*/
 
 	return res
+}
+
+func calculateSum(data []int) float64 {
+	var res float64
+	for _, n := range data {
+		res = res + float64(n)
+	}
+	return res
+}
+
+func calculateAvg(data []int) float64 {
+	var res float64
+	cnt := 0
+	for _, n := range data {
+		res = res + float64(n)
+		cnt = cnt + 1
+	}
+	res = res / float64(cnt)
+	return res
+
 }
 
 func calculateMedian(data []int) float64 {

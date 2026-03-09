@@ -1,40 +1,45 @@
 package storage
 
 import (
-	"HomeTask/3-struct/bins"
-	"encoding/json"
 	"fmt"
 	"os"
-
-	"github.com/fatih/color"
 )
 
-func SaveBinList(content []byte, name string) error {
-	file, err := os.Create(name)
+type StorageDb struct {
+	name string
+}
+
+func NewStorageDb(fileName string) *StorageDb {
+	return &StorageDb{
+		name: fileName,
+	}
+}
+
+func (db *StorageDb) Save(content []byte) {
+	file, err := os.Create(db.name)
 	if err != nil {
-		return err
+		fmt.Println(err)
 	}
 	_, err = file.Write(content)
 	defer file.Close()
 	if err != nil {
-		return err
+		fmt.Println(err)
 	}
 	fmt.Println("Запись успешна")
-	return nil
 
 }
 
-func ReadBinList(name string) (*bins.BinList, error) {
-	var bl *bins.BinList
-	data, err := os.ReadFile(name)
+func (db *StorageDb) Read() ([]byte, error) {
+	data, err := os.ReadFile(db.name)
 	if err != nil {
-		return &bins.BinList{}, err
+		return nil, err
 	}
-	err = json.Unmarshal(data, &bl)
+	return data, nil
+	/*err = json.Unmarshal(data, &bl)
 	if err != nil {
 		color.Red("Не удалось разобрать файл " + err.Error())
 		return &bins.BinList{}, err
 	}
 
-	return bl, nil
+	return bl, nil*/
 }

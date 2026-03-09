@@ -4,17 +4,29 @@ import (
 	"encoding/json"
 	"errors"
 	"time"
+
+	"github.com/fatih/color"
 )
 
+type Db interface {
+	Read() ([]byte, error)
+	Save([]byte)
+}
+
 type Bin struct {
-	Id        string
-	Private   bool
-	CreatedAt time.Time
-	Name      string
+	Id        string    `json:"id"`
+	Private   bool      `json:"private"`
+	CreatedAt time.Time `json:"createdAt"`
+	Name      string    `json:"name"`
 }
 
 type BinList struct {
-	Bins []Bin
+	Bins []Bin `json:"bins"`
+}
+
+type BinListWithDb struct {
+	BinList
+	db Db
 }
 
 func (binList *BinList) ToBytes() ([]byte, error) {
@@ -42,9 +54,61 @@ func NewBin(id string, private bool, createdAt time.Time, name string) (*Bin, er
 	}
 }
 
-func NewBinList(arrB []Bin) *BinList {
+func (bin *Bin) Output() {
+	color.Cyan(bin.Id)
+	if bin.Private {
+		color.Cyan("Private")
+	} else {
+		color.Cyan("Public")
+	}
+	color.Cyan(bin.Name)
+	color.Cyan(bin.CreatedAt.String())
+}
+
+/*func NewBinList(arrB []Bin) *BinList {
 	bl := &BinList{}
 	bl.Bins = arrB
 	return bl
 
+}*/
+
+func NewBinList(db Db) *BinListWithDb {
+	//db := files.NewJsonDb("data.json")
+	file, err := db.Read()
+	if err != nil {
+		return &BinListWithDb{
+			BinList: BinList{
+				Bins: []Bin{},
+			},
+			db: db,
+		}
+	}
+
+	var binList BinList
+	err = json.Unmarshal(file, &binList)
+	if err != nil {
+		//("Не удалось разобрать файл " + err.Error())
+		color.Red("Не удалось разобрать файл " + err.Error())
+		return &BinListWithDb{
+			BinList: BinList{
+				Bins: []Bin{},
+			},
+			db: db,
+		}
+	}
+	return &BinListWithDb{
+		BinList: binList,
+		db:      db,
+	}
+}
+
+func (binList *BinListWithDb) AddBin(bin Bin) {
+
+	binList.Bins = append(binList.Bins, bin)
+	data, err := binList.BinList.ToBytes()
+	if err != nil {
+		//output.PrintError(err)
+		color.Red("Не удалось преобразовать файл " + err.Error())
+	}
+	binList.db.Save(data)
 }
