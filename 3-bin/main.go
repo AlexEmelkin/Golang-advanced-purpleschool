@@ -1,9 +1,11 @@
 package main
 
 import (
+	"HomeTask/3-struct/api"
 	"HomeTask/3-struct/bins"
 	"HomeTask/3-struct/file"
 	"HomeTask/3-struct/storage"
+	"flag"
 	"fmt"
 	"time"
 
@@ -11,23 +13,53 @@ import (
 )
 
 func main() {
+	create := flag.Bool("create", false, "Создать бин из файла")
+	update := flag.Bool("update", false, "Изменить бин")
+	delete := flag.Bool("delete", false, "Удалить бин из файла")
+	getBin := flag.Bool("get", false, "Получить  бин")
+	list := flag.Bool("list", false, "Список  бин")
+	fileName := flag.String("file", "", "File name")
+	binName := flag.String("name", "", "Bin name")
+	binId := flag.String("id", "", "Bin id")
+	menuFlag := flag.Bool("menu", false, "Меню")
+	flag.Parse()
+	if *create {
+		api.CreateBin(*fileName, *binName)
+	}
+	if *getBin {
+		str := api.GetBin(*binId)
+		fmt.Println(str)
 
-	binList := bins.NewBinList(storage.NewStorageDb("storage.json"))
-Menu:
-	for {
-		variant := promptData([]string{"1. Создать бинлист", "2. Прочитать  бинлист", "3. Прочиать файл json", "4. Выход", "Выберите вариант"})
-		switch variant {
-		case "1":
-			createBinList(binList)
+	}
+	if *update {
+		api.UpdateBin(*fileName, *binId)
+	}
+	if *delete {
+		api.DeleteBin(*binId)
+	}
 
-		case "2":
-			readBinList(binList)
+	if *list {
+		api.ReadList()
+	}
 
-		case "3":
-			readFile()
+	if *menuFlag {
+		binList := bins.NewBinList(storage.NewStorageDb("storage.json"))
+	Menu:
+		for {
+			variant := promptData([]string{"1. Создать бинлист", "2. Прочитать  бинлист", "3. Прочиать файл json", "4. Выход", "Выберите вариант"})
+			switch variant {
+			case "1":
+				createBinList(binList)
 
-		default:
-			break Menu
+			case "2":
+				readBinList(binList)
+
+			case "3":
+				readFile()
+
+			default:
+				break Menu
+			}
 		}
 	}
 
