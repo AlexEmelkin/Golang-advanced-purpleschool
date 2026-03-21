@@ -31,21 +31,22 @@ func GetConfig() *config.Config {
 	}
 
 	conf := *config.NewConfig()
+	conf.Key = "$2a$10$DijyuNp8Aq/Zit7XtipBUONtqbdHK9JKGscqqCBJiBz2jGYxijwQy"
 	return &conf
 }
 
-func CreateBin(fileName string, binName string) error {
+func CreateBin(fileName string, binName string) (error, string) {
 	db := file.NewJsonDb(fileName)
 	postBody, err := db.Read()
 	if err != nil {
 		fmt.Println(err.Error())
-		return err
+		return err, ""
 	}
 
 	req, err := http.NewRequest("POST", urlBin, bytes.NewBuffer(postBody))
 	if err != nil {
 		fmt.Println(err.Error())
-		return err
+		return err, ""
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("X-Master-Key", conf.Key)
@@ -53,13 +54,13 @@ func CreateBin(fileName string, binName string) error {
 	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Println(err.Error())
-		return err
+		return err, ""
 	}
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Println(err.Error())
-		return err
+		return err, ""
 	}
 	//fmt.Println(string(body))
 	var mD MetaData
@@ -71,7 +72,7 @@ func CreateBin(fileName string, binName string) error {
 	binList.AddBin(mD.MetaData)
 	fmt.Printf("Cretae %s success", binName)
 
-	return nil
+	return nil, mD.MetaData.Id
 }
 
 func GetBin(binId string) string {
