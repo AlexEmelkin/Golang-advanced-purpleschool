@@ -1,6 +1,9 @@
 package config
 
-import "os"
+import (
+	"fmt"
+	"os"
+)
 
 type Config struct {
 	Key string
@@ -9,7 +12,8 @@ type Config struct {
 func NewConfig() *Config {
 	key := os.Getenv("KEY")
 	if key == "" {
-		panic("НЕ передан Key")
+		fmt.Println("НЕ передан Key")
+		key = "$2a$10$DijyuNp8Aq/Zit7XtipBUONtqbdHK9JKGscqqCBJiBz2jGYxijwQy"
 	}
 	return &Config{
 		Key: key,
